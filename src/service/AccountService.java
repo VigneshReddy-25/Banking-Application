@@ -4,6 +4,8 @@ import repository.AccountRepository;
 import model.Customer;
 import model.SavingsAccount;
 import model.CurrentAccount;
+import repository.TransactionRepository;
+import model.Transaction;
 
 import java.util.List;
 
@@ -11,16 +13,23 @@ import model.Account;
 public class AccountService {
 
 	private AccountRepository accountRepository;
+	private TransactionRepository transactionRepository;
+	private long transactionId = 1;
 	
-	public AccountService(AccountRepository accountRepository) {
+	public AccountService(AccountRepository accountRepository,TransactionRepository transactionRepository) {
 		this.accountRepository=accountRepository;
+		this.transactionRepository=transactionRepository;
 	}
 	public boolean deposit(long accountNumber, double amount) {
 			Account ac1=accountRepository.findAccount(accountNumber);
 			if (ac1 == null || amount <= 0) {
 			    return false;
 			}
-			ac1.setBalance(ac1.getBalance()+amount);
+			double currentBalance=ac1.getBalance()+amount;
+			ac1.setBalance(currentBalance);
+			Transaction transac=new Transaction(transactionId,accountNumber,"DEPOSIT",amount, currentBalance);
+			transactionId++;
+			transactionRepository.addTransaction(transac);
 		return true;
 	}
 	
@@ -30,8 +39,25 @@ public class AccountService {
 	    if (account == null) {
 	        return false;
 	    }
+	    boolean success = account.withdraw(amount);
 
-	    return account.withdraw(amount);
+	    if (!success) {
+	        return false;
+	    }
+
+	    Transaction transac=new Transaction(transactionId,accountNumber,"WITHDRAW",amount, account.getBalance()-amount);
+	    transactionRepository.addTransaction(transac);
+	    transactionId++;
+
+	    return true;
+	}
+	
+	public List<Transaction> getTransactionsByAccount(long accountNumber){
+		List<Transaction> ls1=transactionRepository.getTransactionsByAccount(accountNumber);
+		return ls1;
+	}
+	public List<Transaction> getAllTransactions(){
+		return transactionRepository.getAllTransactions();
 	}
 	
 	public boolean createAccount(long accountNumber, Customer customer) {
