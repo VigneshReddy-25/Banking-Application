@@ -45,7 +45,7 @@ public class AccountService {
 	        return false;
 	    }
 
-	    Transaction transac=new Transaction(transactionId,accountNumber,"WITHDRAW",amount, account.getBalance()-amount);
+	    Transaction transac=new Transaction(transactionId,accountNumber,"WITHDRAW",amount, account.getBalance());
 	    transactionRepository.addTransaction(transac);
 	    transactionId++;
 
