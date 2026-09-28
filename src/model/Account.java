@@ -1,39 +1,41 @@
-package model;	
+package model;
+
 public class Account {
 
-	private long accountNumber;
-	private Customer customer;
-//    private String accountHolderName;
+    private long accountNumber;
+    private String accountHolderName;
     private double balance;
-    
-    
-    
-    public Account(long accountNumber,Customer customer) {
-    	this.accountNumber=accountNumber;
-    	this.customer=customer;
-    	this.balance=0;
+
+    public Account(long accountNumber, String accountHolderName) {
+        this.accountNumber = accountNumber;
+        this.accountHolderName = accountHolderName;
+        this.balance = 0;
     }
-    
+
     public long getAccountNumber() {
-    	return accountNumber;
+        return accountNumber;
     }
-    public Customer getCustomer() {
-    	return customer;
+
+    public String getAccountHolderName() {
+        return accountHolderName;
     }
+
     public double getBalance() {
-    	return balance;
+        return balance;
     }
-    
+
     public void setAccountNumber(long accountNumber) {
-    	this.accountNumber=accountNumber;
+        this.accountNumber = accountNumber;
     }
-    public void setCustomer(Customer customer) {
-    	this.customer=customer;
+
+    public void setAccountHolderName(String accountHolderName) {
+        this.accountHolderName = accountHolderName;
     }
+
     public void setBalance(double balance) {
         this.balance = balance;
     }
-    
+
     public boolean withdraw(double amount) {
         if (amount <= 0 || amount > balance) {
             return false;
@@ -42,11 +44,10 @@ public class Account {
         balance = balance - amount;
         return true;
     }
-	
+
     public String displayAccount() {
-    	return "Account Number: "+ accountNumber
-    			+" Account Holder Name: "+ customer.getName() +
-    			" Balance: "+balance;
+        return "Account Number: " + accountNumber
+                + " Account Holder Name: " + accountHolderName
+                + " Balance: " + balance;
     }
-	
 }
