@@ -1,8 +1,11 @@
 package main;
 
 import model.Customer;
+import model.Transaction;
 import repository.AccountRepository;
+import repository.CustomerRepository;
 import service.AccountService;
+import service.CustomerService;
 import model.Account;
 import repository.TransactionRepository;
 
@@ -24,7 +27,19 @@ public class main {
                 : "Normal Account Creation Failed"
         );
 
-
+        // -------------------------
+        // Create Customer
+        // -------------------------
+        CustomerRepository customerRepo=new CustomerRepository();
+        
+        CustomerService customerService=new CustomerService(customerRepo);
+		System.out.println(
+                customerService.createCustomer(321001, "Vignesh", "reddy@gmail.com", "9182406830", "13-54, Hazi nagar") 
+                ?   "Customer Account Created Successfully" : "Customer Account Creation Failed");
+		
+		
+		
+		
         // -------------------------
         // Create Savings Account
         // -------------------------
@@ -166,6 +181,11 @@ public class main {
 
         for (Account account : accountService.getAllAccounts()) {
             System.out.println(account.displayAccount());
+        }
+        System.out.println("\n--- All Transactions ---");
+
+        for (Transaction transaction : accountService.getAllTransactions()) {
+            System.out.println(transaction.displayTransaction());
         }
         	
 	}
