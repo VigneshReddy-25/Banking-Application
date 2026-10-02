@@ -1,5 +1,8 @@
 package model;
 
+import Exception.InsufficientBalanceException;
+import Exception.InvalidAmountException;
+
 public class Account {
 
     private long accountNumber;
@@ -36,9 +39,12 @@ public class Account {
         this.balance = balance;
     }
 
-    public boolean withdraw(double amount) {
-        if (amount <= 0 || amount > balance) {
-            return false;
+    public boolean withdraw(double amount) throws InsufficientBalanceException, InvalidAmountException {
+    	if (amount <= 0) {
+            throw new InvalidAmountException("Amount must be greater than zero");
+        }
+        if (amount > balance) {
+            throw new InsufficientBalanceException("Insufficient balance. Available balance: " + balance);
         }
 
         balance = balance - amount;
