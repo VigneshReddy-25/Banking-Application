@@ -1,5 +1,8 @@
 package model;
 
+import Exception.InsufficientBalanceException;
+import Exception.InvalidAmountException;
+
 public class CurrentAccount extends Account {
 
     private double overdraftLimit;
@@ -18,10 +21,13 @@ public class CurrentAccount extends Account {
     }
 
     @Override
-    public boolean withdraw(double amount) {
+    public boolean withdraw(double amount) throws InvalidAmountException, InsufficientBalanceException {
 
-        if (amount <= 0 || amount > (getBalance() + overdraftLimit)) {
-            return false;
+        if (amount <= 0 )  {
+        	throw new InvalidAmountException("Amount must be greater than zero");
+        }
+        else if(amount > (getBalance() + overdraftLimit)) {
+        	throw new InsufficientBalanceException("Insufficient balance. Available balance: " + getBalance());
         }
 
         double balance = getBalance() - amount;
