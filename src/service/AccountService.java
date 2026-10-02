@@ -10,6 +10,10 @@ import model.Transaction;
 
 import java.util.List;
 
+import Exception.AccountNotFoundException;
+import Exception.InsufficientBalanceException;
+import Exception.InvalidAmountException;
+
 public class AccountService {
 
     private AccountRepository accountRepository;
@@ -25,26 +29,22 @@ public class AccountService {
         this.transactionRepository = transactionRepository;
     }
 
-    public boolean deposit(long accountNumber, double amount) {
+    public boolean deposit(long accountNumber, double amount) throws AccountNotFoundException, InvalidAmountException {
 
         Account ac1 = accountRepository.findAccount(accountNumber);
 
-        if (ac1 == null || amount <= 0) {
-            return false;
+        if (ac1 == null) {
+            throw new AccountNotFoundException("Account not found " +accountNumber);
+        }
+        else if(amount <= 0) {
+        	throw new InvalidAmountException("Amount must be greater than zero");
         }
 
         double currentBalance = ac1.getBalance() + amount;
 
         ac1.setBalance(currentBalance);
 
-        Transaction transac =
-                new Transaction(
-                        transactionId,
-                        accountNumber,
-                        "DEPOSIT",
-                        amount,
-                        currentBalance
-                );
+        Transaction transac = new Transaction(transactionId, accountNumber, "DEPOSIT", amount, currentBalance);
 
         transactionId++;
 
@@ -53,28 +53,21 @@ public class AccountService {
         return true;
     }
 
-    public boolean withdraw(long accountNumber, double amount) {
+    public boolean withdraw(long accountNumber, double amount) throws AccountNotFoundException, InvalidAmountException, InsufficientBalanceException {
 
         Account account = accountRepository.findAccount(accountNumber);
 
         if (account == null) {
-            return false;
+        	throw new AccountNotFoundException("Account not found " +accountNumber);
         }
 
-        boolean success = account.withdraw(amount);
-
-        if (!success) {
-            return false;
+        if(amount <= 0) {
+        	throw new InvalidAmountException("Amount must be greater than zero");
         }
+        
+        account.withdraw(amount);
 
-        Transaction transac =
-                new Transaction(
-                        transactionId,
-                        accountNumber,
-                        "WITHDRAW",
-                        amount,
-                        account.getBalance()
-                );
+        Transaction transac = new Transaction(transactionId, accountNumber, "WITHDRAW", amount, account.getBalance());
 
         transactionRepository.addTransaction(transac);
 
@@ -137,8 +130,7 @@ public class AccountService {
 
     public List<Transaction> getTransactionsByAccount(long accountNumber) {
 
-        return transactionRepository
-                .getTransactionsByAccount(accountNumber);
+        return transactionRepository.getTransactionsByAccount(accountNumber);
     }
 
     public List<Transaction> getAllTransactions() {
