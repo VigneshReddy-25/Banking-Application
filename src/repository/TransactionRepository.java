@@ -14,14 +14,14 @@ public class TransactionRepository {
 		return true;
 	}
 	public List<Transaction> getTransactionsByAccount(long accountNumber) {
-		List<Transaction> result = new ArrayList<>();
+		List<Transaction> list1=new ArrayList<>();
 		for (Transaction transaction : transactions) {
 		    if (accountNumber == transaction.getAccountNumber()) {
-		        result.add(transaction);
+		        list1.add(transaction);
 		    }
 		}
 
-		return result;
+		return list1;
 	}
 	
 	public List<Transaction> getAllTransactions(){
