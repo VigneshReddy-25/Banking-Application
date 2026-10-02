@@ -1,5 +1,8 @@
 package model;
 
+import Exception.InsufficientBalanceException;
+import Exception.InvalidAmountException;
+
 public class SavingsAccount extends Account {
 
     private double interestRate;
@@ -18,7 +21,7 @@ public class SavingsAccount extends Account {
     }
 
     @Override
-    public boolean withdraw(double amount) {
+    public boolean withdraw(double amount) throws InsufficientBalanceException, InvalidAmountException {
         return super.withdraw(amount);
     }
 }
