@@ -10,8 +10,10 @@ import model.Transaction;
 
 import java.util.List;
 
+import Exception.AccountAlreadyExistsException;
 import Exception.AccountNotFoundException;
 import Exception.InsufficientBalanceException;
+import Exception.InvalidAccountDetailsException;
 import Exception.InvalidAmountException;
 
 public class AccountService {
@@ -76,41 +78,70 @@ public class AccountService {
         return true;
     }
 
-    public boolean createAccount(long accountNumber,
-                                 String accountHolderName) {
+    public boolean createAccount(long accountNumber, String accountHolderName) throws AccountAlreadyExistsException, InvalidAccountDetailsException {
 
-        Account account =
-                new Account(accountNumber, accountHolderName);
+        Account account = new Account(accountNumber, accountHolderName);
+        if(accountNumber <= 0) {
+            throw new InvalidAccountDetailsException("Account number must be greater than zero");
+        }
 
-        return accountRepository.addAccount(account);
+        if(accountHolderName == null || accountHolderName.trim().isEmpty()) {
+            throw new InvalidAccountDetailsException("Account holder name cannot be empty");
+        }
+        boolean created = accountRepository.addAccount(account);
+        if (!created) {
+            throw new AccountAlreadyExistsException("Account already exists: " + accountNumber);
+        }
+
+        return true;
     }
 
-    public boolean createSavingsAccount(long accountNumber,
-                                        String accountHolderName,
-                                        double interestRate) {
+    public boolean createSavingsAccount(long accountNumber, String accountHolderName, double interestRate) throws AccountAlreadyExistsException, InvalidAccountDetailsException {
 
-        SavingsAccount account =
-                new SavingsAccount(
-                        accountNumber,
-                        accountHolderName,
-                        interestRate
-                );
+        SavingsAccount account = new SavingsAccount(accountNumber, accountHolderName, interestRate);
+        
+        if(accountNumber <= 0) {
+            throw new InvalidAccountDetailsException("Account number must be greater than zero");
+        }
 
-        return accountRepository.addAccount(account);
+        if(accountHolderName == null || accountHolderName.trim().isEmpty()) {
+            throw new InvalidAccountDetailsException("Account holder name cannot be empty");
+        }
+        if(interestRate < 0) {
+            throw new InvalidAccountDetailsException("Interest rate cannot be negative");
+        }
+        
+        boolean created = accountRepository.addAccount(account);
+        
+        if (!created) {
+            throw new AccountAlreadyExistsException("Account already exists: " + accountNumber);
+        }
+
+        return true;
     }
 
-    public boolean createCurrentAccount(long accountNumber,
-                                        String accountHolderName,
-                                        double overdraftLimit) {
+    public boolean createCurrentAccount(long accountNumber, String accountHolderName, double overdraftLimit) throws AccountAlreadyExistsException, InvalidAccountDetailsException {
 
-        CurrentAccount account =
-                new CurrentAccount(
-                        accountNumber,
-                        accountHolderName,
-                        overdraftLimit
-                );
+        CurrentAccount account = new CurrentAccount(accountNumber, accountHolderName, overdraftLimit);
+        
+        if(accountNumber <= 0) {
+            throw new InvalidAccountDetailsException("Account number must be greater than zero");
+        }
 
-        return accountRepository.addAccount(account);
+        if(accountHolderName == null || accountHolderName.trim().isEmpty()) {
+            throw new InvalidAccountDetailsException("Account holder name cannot be empty");
+        }
+        if (overdraftLimit < 0) {
+            throw new InvalidAccountDetailsException("Overdraft limit cannot be negative");
+        }
+        
+        boolean created = accountRepository.addAccount(account);
+        
+        if (!created) {
+            throw new AccountAlreadyExistsException("Account already exists: " + accountNumber);
+        }
+
+        return true;
     }
 
     public Account getAccount(long accountNumber) {
