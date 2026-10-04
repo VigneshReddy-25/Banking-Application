@@ -13,17 +13,19 @@ public class TransactionRepository {
 		transactions.add(transaction);
 		return true;
 	}
-	public List<Transaction> getTransactionsByAccount(long accountNumber) {
-		List<Transaction> list1=new ArrayList<>();
-		for (Transaction transaction : transactions) {
-		    if (accountNumber == transaction.getAccountNumber()) {
-		        list1.add(transaction);
-		    }
-		}
 
-		return list1;
+	public List<Transaction> getTransactionsByAccount(long accountNumber) {
+
+	    List<Transaction> list = new ArrayList<>();
+
+	    for (Transaction transaction : transactions) {
+	        if (transaction.getAccountNumber() == accountNumber) {
+	            list.add(transaction);
+	        }
+	    }
+
+	    return list;
 	}
-	
 	public List<Transaction> getAllTransactions(){
 		return new ArrayList<>(transactions);
 	}
