@@ -142,7 +142,7 @@ public class BankingApplication {
         		        System.out.println("Invalid input. Please enter valid numbers.");
         		        scanner.nextLine();
         		    }
-        		    catch(AccountNotFoundException | InvalidAmountException e) {
+        		    catch(AccountNotFoundException | InvalidAmountException | InvalidAccountDetailsException e) {
         		        System.out.println(e.getMessage());
         		    }
         		    break;
@@ -162,9 +162,7 @@ public class BankingApplication {
         		        System.out.println("Invalid input. Please enter valid numbers.");
         		        scanner.nextLine();
         		    }
-        		    catch(AccountNotFoundException |
-        		          InvalidAmountException |
-        		          InsufficientBalanceException e) {
+        		    catch(AccountNotFoundException | InvalidAmountException | InsufficientBalanceException | InvalidAccountDetailsException e) {
 
         		        System.out.println(e.getMessage());
         		    }
@@ -182,6 +180,8 @@ public class BankingApplication {
         		        else
         		            System.out.println("Account not found...");
         		    }
+        		    catch(InvalidAccountDetailsException e) {
+        		    	System.out.println(e.getMessage());        		    }
         		    catch(InputMismatchException e) {
         		        System.out.println("Invalid account number. Please enter a number.");
         		        scanner.nextLine();
@@ -214,9 +214,12 @@ public class BankingApplication {
         		            }
         		        }
         		    }
-        		    catch(InputMismatchException e) {
+        		    catch (InputMismatchException e) {
         		        System.out.println("Invalid account number. Please enter a number.");
         		        scanner.nextLine();
+        		    }
+        		    catch (InvalidAccountDetailsException | AccountNotFoundException e) {
+        		        System.out.println(e.getMessage());
         		    }
         		    break;
         			
@@ -238,6 +241,9 @@ public class BankingApplication {
         		            System.out.println("Account has been deleted...");
         		        else
         		            System.out.println("Account not found...");
+        		    }
+        		    catch(InvalidAccountDetailsException e) {
+        		    	System.out.println(e.getMessage());
         		    }
         		    catch(InputMismatchException e) {
         		        System.out.println("Invalid account number. Please enter a number.");
