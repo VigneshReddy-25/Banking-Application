@@ -111,21 +111,33 @@ public class BankingApplication {
 	        	    break;
         			
         		case 3:
-        			System.out.println("Enter account number: ");
-        			long currAccountNumber=scanner.nextLong();
-        			System.out.println("Enter account holder name: ");
-        			scanner.nextLine();
-        			String currAccountHolderName=scanner.nextLine();
-        			System.out.println("Enter Overdraft Limit: ");
-        			double overdraftLimit=scanner.nextDouble();
-        			try {
-	        			if(accountService.createCurrentAccount(currAccountNumber, currAccountHolderName, overdraftLimit)) 
-	        				System.out.println("Current Account created successfully...");
-        			}
-        			catch(AccountAlreadyExistsException | InvalidAccountDetailsException e) {
-        				System.out.println(e.getMessage());
-        			}
-        			break;
+				    try {
+				        System.out.println("Enter account number: ");
+				        long currAccountNumber = scanner.nextLong();
+				
+				        System.out.println("Enter account holder name: ");
+				        scanner.nextLine();
+				        String currAccountHolderName = scanner.nextLine();
+				
+				        System.out.println("Enter Overdraft Limit: ");
+				        double overdraftLimit = scanner.nextDouble();
+				
+				        if(accountService.createCurrentAccount(
+				                currAccountNumber,
+				                currAccountHolderName,
+				                overdraftLimit)) {
+				
+				            System.out.println("Current Account created successfully...");
+				        }
+				    }
+				    catch(InputMismatchException e) {
+				        System.out.println("Invalid input. Please enter valid numbers.");
+				        scanner.nextLine();
+				    }
+				    catch(AccountAlreadyExistsException | InvalidAccountDetailsException e) {
+				        System.out.println(e.getMessage());
+				    }
+				    break;
         			
         		case 4:
         		    try {
