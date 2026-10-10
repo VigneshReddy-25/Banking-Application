@@ -29,39 +29,49 @@ public class AccountRepository {
 	}
 
 	public Account findAccount(long accountNumber) throws SQLException {
-		
-		
-		String query="select * from account where account_number= ?";
+
+	    String query = "SELECT * FROM account WHERE account_number = ?";
+	
+	    try (Connection con = DatabaseConnection.getConnection();
+	         PreparedStatement ps = con.prepareStatement(query)) {
+	
+	        ps.setLong(1, accountNumber);
+	
+	        try (ResultSet rs = ps.executeQuery()) {
+	
+	            if (rs.next()) {
+	
+	                long accountNo = rs.getLong("account_number");
+	                String accountHolderName =
+	                        rs.getString("account_holder_name");
+	                double balance = rs.getDouble("balance");
+	
+	                Account account =
+	                        new Account(accountNo, accountHolderName);
+	
+	                account.setBalance(balance);
+	
+	                return account;
+	            }
+	        }
+	    }
+
+	    return null;
+	}
+	
+	public boolean removeAccount(long accountNumber) throws SQLException {
+		String query="delete from account where account_number= ? ";
 		try(Connection con=DatabaseConnection.getConnection();
 				PreparedStatement ps=con.prepareStatement(query)){
+			ps.setLong(1, accountNumber);
+			int rows = ps.executeUpdate();
+			return rows>0;
 			
-			ps.setLong(1,accountNumber);
-			ResultSet rs = ps.executeQuery();
-			 if (rs.next()) {
-	                // Assuming you map the row to an Account object here
-//	                Account account = new Account();
-//	                account.setAccountNumber(rs.getLong("account_number"));
-//	                account.setAccountHolderName(rs.getString("account_holder_name"));
-//	                account.setBalance(rs.getBigDecimal("balance"));
-//	                account.setAccountType(rs.getString("account_type"));
-//	                account.setInterestRate(rs.getBigDecimal("interest_rate"));
-//	                return account;
-	            }
 		}
-		
-	}
-	public boolean removeAccount(long accountNumber) {
-		Iterator<Account> ite=accounts.iterator();
-		while(ite.hasNext()) {
-			Account account1=ite.next();
-			if(account1.getAccountNumber()==accountNumber) {
-				ite.remove();
-				return true;
-			}
-		}
-		return false;
 	}
 	public List<Account> getAllAccounts(){
+		String query="select * from account";
+		
 		return new ArrayList<>(accounts);
 	}
 }
