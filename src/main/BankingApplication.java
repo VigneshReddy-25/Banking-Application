@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import Exception.AccountAlreadyExistsException;
 import Exception.AccountNotFoundException;
+import Exception.DatabaseOperationException;
 import Exception.InsufficientBalanceException;
 import Exception.InvalidAccountDetailsException;
 import Exception.InvalidAmountException;
@@ -93,10 +94,7 @@ public class BankingApplication {
 	        	        System.out.println("Enter Interest Rate: ");
 	        	        double interestRate = scanner.nextDouble();
 
-	        	        if(accountService.createSavingsAccount(
-	        	                savAccountNumber,
-	        	                savAccountHolderName,
-	        	                interestRate)) {
+	        	        if(accountService.createSavingsAccount(savAccountNumber, savAccountHolderName, interestRate)) {
 
 	        	            System.out.println("Savings Account created successfully...");
 	        	        }
@@ -122,10 +120,7 @@ public class BankingApplication {
 				        System.out.println("Enter Overdraft Limit: ");
 				        double overdraftLimit = scanner.nextDouble();
 				
-				        if(accountService.createCurrentAccount(
-				                currAccountNumber,
-				                currAccountHolderName,
-				                overdraftLimit)) {
+				        if(accountService.createCurrentAccount(currAccountNumber, currAccountHolderName, overdraftLimit)) {
 				
 				            System.out.println("Current Account created successfully...");
 				        }
