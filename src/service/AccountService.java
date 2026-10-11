@@ -8,10 +8,12 @@ import model.SavingsAccount;
 import model.CurrentAccount;
 import model.Transaction;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import Exception.AccountAlreadyExistsException;
 import Exception.AccountNotFoundException;
+import Exception.DatabaseOperationException;
 import Exception.InsufficientBalanceException;
 import Exception.InvalidAccountDetailsException;
 import Exception.InvalidAmountException;
@@ -30,34 +32,42 @@ public class AccountService {
         this.transactionRepository = transactionRepository;
     }
 
-    public boolean deposit(long accountNumber, double amount) throws AccountNotFoundException, InvalidAmountException, InvalidAccountDetailsException {
+    public boolean deposit(long accountNumber, double amount) throws AccountNotFoundException, InvalidAmountException, InvalidAccountDetailsException, DatabaseOperationException {
 
-        if (accountNumber <= 0) {
-            throw new InvalidAccountDetailsException("Account number must be greater than zero");
-        }
+	    if (accountNumber <= 0) {
+	        throw new InvalidAccountDetailsException("Account number must be greater than zero");
+	    }
+	
+	    Account account = accountRepository.findAccount(accountNumber);
+	
+	    if (account == null) {
+	        throw new AccountNotFoundException("Account not found: " + accountNumber);
+	    }
+	
+	    if (amount <= 0) {
+	        throw new InvalidAmountException("Amount must be greater than zero");
+	    }
+	
+	    double newBalance = account.getBalance() + amount;
+	
+	    boolean updated = accountRepository.updateBalance(accountNumber, newBalance);
+	
+	    if (!updated) {
+	        throw new DatabaseOperationException("Failed to update account balance.", null);
+	    }
+	
+	    account.setBalance(newBalance);
+	
+	    Transaction transaction = new Transaction(transactionId, accountNumber, "DEPOSIT", amount, newBalance);
+	
+	    transactionRepository.addTransaction(transaction);
+	
+	    transactionId++;
+	
+	    return true;
+}
 
-        Account ac1 = accountRepository.findAccount(accountNumber);
-
-        if (ac1 == null) {
-            throw new AccountNotFoundException("Account not found: " + accountNumber);
-        }
-
-        if (amount <= 0) {
-            throw new InvalidAmountException("Amount must be greater than zero");
-        }
-
-        double currentBalance = ac1.getBalance() + amount;
-        ac1.setBalance(currentBalance);
-
-        Transaction transac = new Transaction(transactionId, accountNumber, "DEPOSIT", amount, currentBalance);
-
-        transactionId++;
-        transactionRepository.addTransaction(transac);
-
-        return true;
-    }
-
-    public boolean withdraw(long accountNumber, double amount) throws AccountNotFoundException, InvalidAmountException, InsufficientBalanceException, InvalidAccountDetailsException {
+    public boolean withdraw(long accountNumber, double amount) throws AccountNotFoundException, InvalidAmountException, InsufficientBalanceException, InvalidAccountDetailsException, DatabaseOperationException {
 
     	if (accountNumber <= 0) {
             throw new InvalidAccountDetailsException("Account number must be greater than zero");
@@ -74,6 +84,8 @@ public class AccountService {
         }
         
         account.withdraw(amount);
+        
+        accountRepository.updateBalance(accountNumber, account.getBalance());
 
         Transaction transac = new Transaction(transactionId, accountNumber, "WITHDRAW", amount, account.getBalance());
 
@@ -84,7 +96,7 @@ public class AccountService {
         return true;
     }
 
-    public boolean createAccount(long accountNumber, String accountHolderName) throws AccountAlreadyExistsException, InvalidAccountDetailsException {
+    public boolean createAccount(long accountNumber, String accountHolderName) throws AccountAlreadyExistsException, InvalidAccountDetailsException, DatabaseOperationException {
 
         if(accountNumber <= 0) {
             throw new InvalidAccountDetailsException("Account number must be greater than zero");
@@ -103,7 +115,7 @@ public class AccountService {
         return true;
     }
 
-    public boolean createSavingsAccount(long accountNumber, String accountHolderName, double interestRate) throws AccountAlreadyExistsException, InvalidAccountDetailsException {
+    public boolean createSavingsAccount(long accountNumber, String accountHolderName, double interestRate) throws AccountAlreadyExistsException, InvalidAccountDetailsException, DatabaseOperationException {
 
 	    if(accountNumber <= 0) {
 	        throw new InvalidAccountDetailsException("Account number must be greater than zero");
@@ -129,7 +141,7 @@ public class AccountService {
 	    return true;
     }
 
-    public boolean createCurrentAccount(long accountNumber, String accountHolderName, double overdraftLimit) throws AccountAlreadyExistsException, InvalidAccountDetailsException {
+    public boolean createCurrentAccount(long accountNumber, String accountHolderName, double overdraftLimit) throws AccountAlreadyExistsException, InvalidAccountDetailsException, DatabaseOperationException {
 
 	    if(accountNumber <= 0) {
 	        throw new InvalidAccountDetailsException("Account number must be greater than zero");
@@ -155,7 +167,7 @@ public class AccountService {
 	    return true;
 	}
 
-    public Account getAccount(long accountNumber) throws InvalidAccountDetailsException {
+    public Account getAccount(long accountNumber) throws InvalidAccountDetailsException, DatabaseOperationException {
 
         if (accountNumber <= 0) {
             throw new InvalidAccountDetailsException("Account number must be greater than zero");
@@ -164,12 +176,12 @@ public class AccountService {
         return accountRepository.findAccount(accountNumber);
     }
 
-    public List<Account> getAllAccounts() {
+    public List<Account> getAllAccounts() throws SQLException, DatabaseOperationException {
 
         return accountRepository.getAllAccounts();
     }
 
-    public boolean closeAccount(long accountNumber) throws InvalidAccountDetailsException {
+    public boolean closeAccount(long accountNumber) throws InvalidAccountDetailsException, SQLException, DatabaseOperationException {
 
         if (accountNumber <= 0) {
             throw new InvalidAccountDetailsException("Account number must be greater than zero");
@@ -178,7 +190,7 @@ public class AccountService {
         return accountRepository.removeAccount(accountNumber);
     }
 
-    public List<Transaction> getTransactionsByAccount(long accountNumber) throws InvalidAccountDetailsException, AccountNotFoundException {
+    public List<Transaction> getTransactionsByAccount(long accountNumber) throws InvalidAccountDetailsException, AccountNotFoundException, DatabaseOperationException {
 
     	if (accountNumber <= 0) {
             throw new InvalidAccountDetailsException("Account number must be greater than zero");
@@ -193,7 +205,7 @@ public class AccountService {
         return transactionRepository.getTransactionsByAccount(accountNumber);
     }
 
-    public List<Transaction> getAllTransactions() {
+    public List<Transaction> getAllTransactions() throws DatabaseOperationException {
 
         return transactionRepository.getAllTransactions();
     }
