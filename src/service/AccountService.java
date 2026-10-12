@@ -8,7 +8,6 @@ import model.SavingsAccount;
 import model.CurrentAccount;
 import model.Transaction;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import Exception.AccountAlreadyExistsException;
@@ -23,7 +22,6 @@ public class AccountService {
     private AccountRepository accountRepository;
     private TransactionRepository transactionRepository;
 
-    private long transactionId = 1;
 
    
     public AccountService(AccountRepository accountRepository, TransactionRepository transactionRepository) {
@@ -58,14 +56,12 @@ public class AccountService {
 	
 	    account.setBalance(newBalance);
 	
-	    Transaction transaction = new Transaction(transactionId, accountNumber, "DEPOSIT", amount, newBalance);
+	    Transaction transaction = new Transaction(accountNumber, "DEPOSIT", amount, newBalance);
 	
 	    transactionRepository.addTransaction(transaction);
 	
-	    transactionId++;
-	
 	    return true;
-}
+    }
 
     public boolean withdraw(long accountNumber, double amount) throws AccountNotFoundException, InvalidAmountException, InsufficientBalanceException, InvalidAccountDetailsException, DatabaseOperationException {
 
@@ -85,13 +81,15 @@ public class AccountService {
         
         account.withdraw(amount);
         
-        accountRepository.updateBalance(accountNumber, account.getBalance());
+        boolean updated = accountRepository.updateBalance(accountNumber, account.getBalance());
+        
+        if (!updated) {
+	        throw new DatabaseOperationException("Failed to update account balance.", null);
+	    }
 
-        Transaction transac = new Transaction(transactionId, accountNumber, "WITHDRAW", amount, account.getBalance());
+        Transaction transac = new Transaction(accountNumber, "WITHDRAW", amount, account.getBalance());
 
         transactionRepository.addTransaction(transac);
-
-        transactionId++;
 
         return true;
     }
@@ -176,12 +174,12 @@ public class AccountService {
         return accountRepository.findAccount(accountNumber);
     }
 
-    public List<Account> getAllAccounts() throws SQLException, DatabaseOperationException {
+    public List<Account> getAllAccounts() throws DatabaseOperationException {
 
         return accountRepository.getAllAccounts();
     }
 
-    public boolean closeAccount(long accountNumber) throws InvalidAccountDetailsException, SQLException, DatabaseOperationException {
+    public boolean closeAccount(long accountNumber) throws InvalidAccountDetailsException, DatabaseOperationException {
 
         if (accountNumber <= 0) {
             throw new InvalidAccountDetailsException("Account number must be greater than zero");
