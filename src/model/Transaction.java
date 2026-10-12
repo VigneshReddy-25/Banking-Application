@@ -7,8 +7,8 @@ public class Transaction {
 	private String transactionType;
 	private double amount;
 	private double balanceAfterTransaction;
-	public Transaction(long transactionId,long accountNumber ,String transactionType,double amount,double balanceAfterTransaction) {
-		this.transactionId=transactionId;
+	public Transaction(long accountNumber ,String transactionType,double amount,double balanceAfterTransaction) {
+//		this.transactionId=transactionId;
 		this.accountNumber=accountNumber;
 		this.transactionType=transactionType;
 		this.amount=amount;
@@ -29,6 +29,11 @@ public class Transaction {
 	public double getBalanceAfterTransaction() {
 		return balanceAfterTransaction;
 	}
+	
+	public void setTransactionId(long transactionId) {
+		this.transactionId=transactionId;
+	}
+	
 	public String displayTransaction() {
 		return "Transaction ID: "+ transactionId+
 				" Account Number: "+ accountNumber+
