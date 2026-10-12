@@ -20,9 +20,8 @@ public class DatabaseConnection {
             return con;
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        	throw new SQLException("MySQL JDBC Driver not found.", e);
         }
 
-        return null;
     }
 }
