@@ -16,12 +16,11 @@ public class TransactionRepository {
     public boolean addTransaction(Transaction transaction)
             throws DatabaseOperationException {
 
-        String query = "INSERT INTO transactions VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO transactions VALUES ( ?, ?, ?, ?)";
 
         try (Connection con = DatabaseConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
 
-            ps.setLong(1, transaction.getTransactionId());
             ps.setLong(2, transaction.getAccountNumber());
             ps.setString(3, transaction.getTransactionType());
             ps.setDouble(4, transaction.getAmount());
@@ -51,8 +50,8 @@ public class TransactionRepository {
 
                 while (rs.next()) {
 
-                    Transaction trans = new Transaction(rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getDouble(4), rs.getDouble(5));
-
+                    Transaction trans = new Transaction(rs.getLong(2), rs.getString(3), rs.getDouble(4), rs.getDouble(5));
+                    trans.setTransactionId(rs.getLong(1));
                     transactions.add(trans);
                 }
             }
@@ -76,8 +75,8 @@ public class TransactionRepository {
 
             while (rs.next()) {
 
-                Transaction trans = new Transaction( rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getDouble(4), rs.getDouble(5));
-
+                Transaction trans = new Transaction(rs.getLong(2), rs.getString(3), rs.getDouble(4), rs.getDouble(5));
+                trans.setTransactionId(1);
                 transactions.add(trans);
             }
         }
