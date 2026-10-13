@@ -53,7 +53,7 @@ public class Account {
 
     public String displayAccount() {
         return "Account Number: " + accountNumber
-                + " Account Holder Name: " + accountHolderName
-                + " Balance: " + balance;
+                + "\n Account Holder Name: " + accountHolderName
+                + "\n Balance: " + balance;
     }
 }
